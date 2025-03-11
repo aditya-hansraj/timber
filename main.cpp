@@ -5,10 +5,17 @@ using namespace sf;
 using namespace std;
 // g++ -o out/timber main.cpp -lsfml-graphics -lsfml-window -lsfml-system
 
+enum Side {
+    LEFT, RIGHT, NONE
+};
+
 const int NUM_BRANCHES = 6;
 
-int main()
-{
+Side branchPositon[NUM_BRANCHES];
+
+void updateBranches(int seed);
+
+int main() {
     VideoMode vm(1600, 900);
     View view(FloatRect(0, 0, 1600, 900));
     RenderWindow window(vm, "Timber");
@@ -43,8 +50,11 @@ int main()
     spriteBee.setPosition(1500, 555);
     spritePlayer.setPosition(500, 708);
 
+    Side brancPosition[NUM_BRANCHES];
+
     for (int i = 0; i < NUM_BRANCHES; i++)
     {
+    	float height = i * 150;
         spriteBranches[i].setTexture(textureBranch);
         spriteBranches[i].setPosition(2000, 2000);
         spriteBranches[i].setOrigin(220, 20);
@@ -238,4 +248,29 @@ int main()
     }
 
     return 0;
+}
+
+void updateBranches(int seed) {
+    for(int j = NUM_BRANCHES-1; j > 0; j--) {
+        branchPositon[j] = branchPositon[j-1];
+    }
+
+    srand((int)time(0) + seed);
+    int r = rand() % 5;
+    switch(r) {
+        case 0:
+            branchPositon[0] = Side::LEFT;
+            break;
+        case 1:
+            branchPositon[0] = Side::RIGHT;
+        case 2:
+            branchPositon[0] = Side::LEFT;
+            break;
+        case 3:
+            branchPositon[0] = Side::NONE;
+            break;
+        case 4:
+            branchPositon[0] = Side::RIGHT;
+            break;
+    }
 }
