@@ -2,10 +2,11 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/System.hpp>
+#include <SFML/Audio.hpp>
 #include <ctime>
 #include <cstdlib>
 
-// g++ -o out/timber main.cpp -lsfml-graphics -lsfml-window -lsfml-system
+// g++ main.cpp -o out/timber -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 
 using namespace std;
 using namespace sf;
@@ -92,8 +93,8 @@ int main()
     Sprite spriteAxe;
     spriteAxe.setTexture(textureAxe);
     spriteAxe.setPosition(710, 820);
-    const float AXE_POSITION_LEFT = 700;
-    const float AXE_POSITION_RIGHT = 1075;
+    const float AXE_POSITION_LEFT = 600;
+    const float AXE_POSITION_RIGHT = 900;
     
     //Log
     Texture textureLog;
@@ -104,6 +105,23 @@ int main()
     bool logActive = false;
     float logSpeedX = 1000;
     float logSpeedY = -1500;
+    
+    // --------------------------------------------------------------------
+    
+    SoundBuffer deathBuffer;
+	deathBuffer.loadFromFile("./assets/sound/death.wav");
+	Sound death;
+	death.setBuffer(deathBuffer);
+
+	SoundBuffer chopBuffer;
+	chopBuffer.loadFromFile("./assets/sound/chop.wav");
+	Sound chop;
+	chop.setBuffer(chopBuffer);
+
+	SoundBuffer dotBuffer;
+	dotBuffer.loadFromFile("./assets/sound/out_of_time.wav");
+	Sound dot;
+	dot.setBuffer(dotBuffer);
     
     //---------------------------------------------------------------------
     bool beeActive = false;
@@ -188,6 +206,7 @@ int main()
             {
                 PlayerSide = side::RIGHT;
                 score++;
+                chop.play();
                 timeRemaining += 0.15 + (2/score);
                 spriteAxe.setPosition(AXE_POSITION_RIGHT, spriteAxe.getPosition().y);
                 spritePlayer.setPosition(980, 720);
@@ -202,6 +221,7 @@ int main()
             {
                 PlayerSide = side::LEFT;
                 score++;
+                chop.play();
                 timeRemaining += 0.15 + (2/score);
                 spriteAxe.setPosition(AXE_POSITION_LEFT, spriteAxe.getPosition().y);
                 spritePlayer.setPosition(500, 720);
@@ -220,6 +240,7 @@ int main()
             
             if(timeRemaining <= 0.0f) {
                 paused = true;
+                dot.play();
                 messageText.setString("Out Of Time!!!");
                 // Fix: Center message text to 1600x900 resolution
                 messageText.setPosition(1600/2.0f, 900/2.0f);
@@ -327,6 +348,7 @@ int main()
             //Player Death
             if(branchPositions[5] == PlayerSide) {
                 paused = true;
+                death.play();
                 acceptInput = false;
                 spritePlayer.setPosition(2000, 320);
                 spriteRip.setPosition(525, 760);
@@ -350,15 +372,15 @@ int main()
         window.draw(spriteCloud1);
         window.draw(spriteCloud2);
         window.draw(spriteBee);
+        window.draw(spritePlayer);
+        window.draw(spriteRip);
+        window.draw(spriteLog);
+        window.draw(spriteAxe);
         window.draw(scoreText);
         window.draw(timeBar);
         for(int i = 0; i < NUM_BRANCHES; i++) {
             window.draw(spriteBranches[i]);
         }
-        window.draw(spritePlayer);
-        window.draw(spriteRip);
-        window.draw(spriteAxe);
-        window.draw(spriteLog);
         window.display();
     }
 
