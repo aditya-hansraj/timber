@@ -11,7 +11,7 @@ enum Side {
 
 const int NUM_BRANCHES = 6;
 
-Side branchPositon[NUM_BRANCHES];
+Side branchPosition[NUM_BRANCHES];  // Fixed typo here
 
 void updateBranches(int seed);
 
@@ -22,16 +22,19 @@ int main() {
     window.setView(view);
 
     // Textures
-    Texture textureBG, textureTree, textureCloud, textureBee, textureBranch, texturePlayer;
+    Texture textureBG, textureTree, textureCloud, textureBee, textureBranch, texturePlayer, textureRip, textureAxe, textureLog;
     textureBG.loadFromFile("./assets/graphics/background.jpeg");
     textureTree.loadFromFile("./assets/graphics/tree.jpeg");
     textureCloud.loadFromFile("./assets/graphics/cloud.png");
     textureBee.loadFromFile("./assets/graphics/bee.png");
     textureBranch.loadFromFile("./assets/graphics/branch.png");
     texturePlayer.loadFromFile("./assets/graphics/player.png");
+    textureRip.loadFromFile("./assets/graphics/rip.png");
+    textureAxe.loadFromFile("./assets/graphics/axe.png");
+    textureLog.loadFromFile("./assets/graphics/log.png");
 
     // Sprites
-    Sprite spriteBG, spriteTree, spriteCloud1, spriteCloud2, spriteCloud3, spriteBee, spritePlayer;
+    Sprite spriteBG, spriteTree, spriteCloud1, spriteCloud2, spriteCloud3, spriteBee, spritePlayer, spriteAxe, spriteRip, 	      spriteLog;
     Sprite spriteBranches[NUM_BRANCHES];
 
     spriteBG.setTexture(textureBG);
@@ -41,6 +44,9 @@ int main() {
     spriteCloud3.setTexture(textureCloud);
     spriteBee.setTexture(textureBee);
     spritePlayer.setTexture(texturePlayer);
+    spriteRip.setTexture(textureRip);
+    spriteAxe.setTexture(textureAxe);
+    spriteLog.setTexture(textureLog);
 
     spriteBG.setPosition(0, 0);
     spriteTree.setPosition(650, 0);
@@ -48,13 +54,22 @@ int main() {
     spriteCloud2.setPosition(0, 50);
     spriteCloud3.setPosition(0, 0);
     spriteBee.setPosition(1500, 555);
-    spritePlayer.setPosition(500, 708);
+    spritePlayer.setPosition(580, 720);
+    spriteRip.setPosition(600, 860);
+    spriteAxe.setPosition(710, 820);
+    spriteLog.setPosition(810, 720);
+    Side playerSide = Side::LEFT;  // Fixed typo here
+    const float AXE_POSITION_LEFT = 700;
+    const float AXE_POSITION_RIGHT = 1075;
+    bool logActive = false;
+    float logSpeedX = 1000;
+    float logSpeedY = -1500;
 
-    Side brancPosition[NUM_BRANCHES];
+    Side branchPosition[NUM_BRANCHES];  // Fixed typo here
 
     for (int i = 0; i < NUM_BRANCHES; i++)
     {
-    	float height = i * 150;
+        float height = i * 150;
         spriteBranches[i].setTexture(textureBranch);
         spriteBranches[i].setPosition(2000, 2000);
         spriteBranches[i].setOrigin(220, 20);
@@ -123,6 +138,15 @@ int main() {
         if (Keyboard::isKeyPressed(Keyboard::Space))
         {
             paused = false;
+        }
+        if (Keyboard::isKeyPressed(Keyboard::Left)) {
+            playerSide = Side::LEFT;
+            spriteAxe.setPosition(AXE_POSITION_LEFT, spriteAxe.getPosition().y);  // Move axe to left side
+        }
+
+        if (Keyboard::isKeyPressed(Keyboard::Right)) {
+            playerSide = Side::RIGHT;
+            spriteAxe.setPosition(AXE_POSITION_RIGHT, spriteAxe.getPosition().y);  // Move axe to right side
         }
 
         Time dt = clock.restart();
@@ -233,6 +257,9 @@ int main() {
         window.draw(spritePlayer); // Player sprite
         window.draw(scoreText);
         window.draw(timeBar);
+        window.draw(spriteRip);
+        window.draw(spriteAxe);
+        window.draw(spriteLog);
 
         for (int i = 0; i < NUM_BRANCHES; i++)
         {
@@ -251,26 +278,28 @@ int main() {
 }
 
 void updateBranches(int seed) {
-    for(int j = NUM_BRANCHES-1; j > 0; j--) {
-        branchPositon[j] = branchPositon[j-1];
+    for (int j = NUM_BRANCHES-1; j > 0; j--) {
+        branchPosition[j] = branchPosition[j-1];
     }
 
     srand((int)time(0) + seed);
     int r = rand() % 5;
-    switch(r) {
+    switch (r) {
         case 0:
-            branchPositon[0] = Side::LEFT;
+            branchPosition[0] = Side::LEFT;
             break;
         case 1:
-            branchPositon[0] = Side::RIGHT;
+            branchPosition[0] = Side::RIGHT;
+            break;  // Added missing break
         case 2:
-            branchPositon[0] = Side::LEFT;
+            branchPosition[0] = Side::LEFT;
             break;
         case 3:
-            branchPositon[0] = Side::NONE;
+            branchPosition[0] = Side::NONE;
             break;
         case 4:
-            branchPositon[0] = Side::RIGHT;
+            branchPosition[0] = Side::RIGHT;
             break;
     }
 }
+
